@@ -821,7 +821,7 @@ def _write_runner_scripts(rctx, sdk):
                 executable = True,
             )
 
-def _write_sdk_layout(rctx, sdk, emulator):
+def _write_sdk_layout(rctx, emulator):
     # Gradle and other SDK consumers expect build-tools/<version>, without the
     # extra host-platform directory used by the Bazel tool labels.
     platform = rctx.attr.platform
@@ -847,7 +847,7 @@ def _hermetic_android_sdk_platform_repository_impl(rctx):
     _download_sdk_platform_tools(rctx, sdk)
     _download_emulator(rctx, emulator)
     _write_runner_scripts(rctx, sdk)
-    _write_sdk_layout(rctx, sdk, emulator)
+    _write_sdk_layout(rctx, emulator)
 
     rctx.template(
         "BUILD.bazel",
