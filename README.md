@@ -148,31 +148,3 @@ mobile-install:linux --adb=external/+android+androidsdk_linux/platform-tools/lin
 mobile-install:macos --adb=external/+android+androidsdk_darwin/platform-tools/darwin/adb
 mobile-install:windows --adb=external/+android+androidsdk_windows/platform-tools/windows/adb.exe
 ```
-
-## Exporting installations to local build tools
-
-`@androidndk//:ndk_root` and `@androidsdk//:sdk_root` each expose one source
-file. Resolve that file through Bazel runfiles, then resolve symlinks on the file
-**before** taking its parent directory. The resulting absolute directory is the
-complete downloaded NDK or a standard Android SDK layout. These are local
-integration markers, not hermetic action inputs: the marker's runfiles directory
-alone does not contain the installation.
-
-The SDK layout links the configured `platforms`, `build-tools/<version>`, and
-`platform-tools`, plus the emulator and system images when configured. No extra
-packages are downloaded or copied. Platform `package.xml` metadata is generated
-from the archive properties when absent, so Gradle can discover decimal API levels
-such as `37.0`. With AGP 9.1, select this with `compileSdk = 37` and
-`compileSdkMinor = 0`. SDK Manager must not modify this Bazel-managed
-installation. A Gradle project must use a compile SDK and build-tools version
-present in the configured installation.
-
-The redirect labels select by the consumer's platform. Rules that export paths
-for local Gradle builds must transition these attributes to Bazel's **host
-platform**, even when the target platform is Android or execution is remote.
-Generate the absolute paths at `bazel run` time, not in cacheable build actions.
-Regenerate them when changing versions or after clearing Bazel's repository cache.
-
-`@androidndk//:all_files` also exposes the complete selected NDK, including the
-clang and sysroot subpackages, for consumers that actually need its file set.
-Use the root marker when only a local path is needed.
